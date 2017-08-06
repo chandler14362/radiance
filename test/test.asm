@@ -1,10 +1,9 @@
-%include 'util.inc'
-%include 'lib.inc'
-%include 'type.inc'
-
-entrypoint main
+%include 'common.inc'
 
 cextern printf
+extern tick
+
+entrypoint main
 
 section .data
 	msg byte_st "test", 10, 0
@@ -12,7 +11,7 @@ section .data
 section .text
 main:
 	sub esp, 12
-	mov dword[esp], msg
-	call printf
+	call tick
 	add esp, 12
+	jmp main
 	ret
