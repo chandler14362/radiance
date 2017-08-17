@@ -6,6 +6,7 @@ install_macros(display/sdl2
 )
 
 set(SDL2_SOURCES 
+    display.asm
     event.asm
 )
 
