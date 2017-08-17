@@ -3,36 +3,43 @@
 global radiance.strcmp
 
 section .text
+
+
+; RADIANCE.STRCMP
+; compares two null terminated strings 
 radiance.strcmp:
     prologue 16
+
     mov edi, [ebp + 8] ; str a ptr
     mov esi, [ebp + 12] ; str b ptr
     xor ecx, ecx
 
 .compare:
-    mov ah, byte_t [edi + ecx]
-    mov al, byte_t [esi + ecx]
+    mov eax, int32_t [edi + ecx]
+    mov ebx, int32_t [esi + ecx]
     inc ecx
 
-    cmp ah, al
-    je .checkend
-    
-    cmp ah, byte_t 0
-    je .endless
-    cmp al,  byte_t 0
-    je .endgreater
+    cmp al, bl
+    jne .failure
 
-.endless:
+    cmp al, 0
+    je .success
+
+    cmp ah, bh
+    jne .failure
+
+    cmp ah, 0
+    je .success
+
+    jmp .compare ; loop again
+
+.failure:
     mov eax, -1
     jmp .end
 
-.endgreater:
-    mov eax, 1
+.success:
+    mov eax, 0
     jmp .end
-
-.checkend:
-    cmp eax, 0
-    jne .compare
 
 .end: 
     epilogue 16
