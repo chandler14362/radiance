@@ -9,6 +9,7 @@ extern radiance.strcmp
 
 global radiance.event.register
 global radiance.event.remove
+global radiance.event.find
 global radiance.event.cap
 
 section .data
@@ -29,7 +30,7 @@ radiance.event.register:
     mov esi, pointer_t [ebp + 8] ; event name
 
     mov pointer_t [esp], esi ; check to see if an event with the name already exists
-    call find_event
+    call radiance.event.find
 
     cmp eax, -1 ; check to see if we are trying to register an event that already exists
     jne .failure
@@ -81,9 +82,9 @@ radiance.event.remove:
     epilogue 16
 
 
-; FIND_EVENT
+; RADIANCE.EVENT.FIND
 ; gets the address of an event by name
-find_event:
+radiance.event.find:
     prologue 16
 
     mov esi, pointer_t [ebp + 8] ; event name
