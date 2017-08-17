@@ -7,4 +7,4 @@ set(DRAW_SOURCES
 )
 
 add_nasm_includes()
-add_engine_object(engine.draw "${EVENT_SOURCES}")
+add_engine_object(engine.draw "${DRAW_SOURCES}")

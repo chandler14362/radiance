@@ -1,5 +1,5 @@
 install_macros(engine/event
-    member.inc
+    artifact.inc
     types.inc
 )
 
