@@ -5,8 +5,8 @@ global radiance.strcmp
 section .text
 radiance.strcmp:
     prologue 16
-    mov edi, [ebp + 8] ; str 1 ptr
-    mov esi, [ebp + 12] ; str 2 ptr
+    mov edi, [ebp + 8] ; str a ptr
+    mov esi, [ebp + 12] ; str b ptr
     xor ecx, ecx
 
 .compare:
