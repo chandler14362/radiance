@@ -22,10 +22,8 @@
 %xdefine int32_rt resd
 %xdefine uint32_rt resd
 
-%xdefine struct_rt(t) resb t.size
-
-%macro struct_rt 1
-    resb %1.size
+%macro struct_rt 1-2 1
+    resb %1.size * %2
 %endmacro
 
 %macro cextern 1
