@@ -35,15 +35,14 @@ radiance.event.register:
     cmp eax, -1 ; check to see if we are trying to register an event that already exists
     jne .failure
 
-    mov int32_t [ecx], idcounter ; get a new id
-    inc ecx
+    mov edx, idcounter ; get a new id
+    inc int32_t [edx]
 
     call get_available ; get an available address
     cmp eax, -1
     je .failure
 
-    mov int32_t [eax + RadianceEvent.id], ecx ; claim the event as our own
-    mov edx, ecx
+    mov int32_t [eax + RadianceEvent.id], edx ; claim the event as our own
 
     ; copy the name to the event
     xor ecx, ecx
@@ -61,7 +60,7 @@ radiance.event.register:
     jmp .copy
 
 .done:
-    mov eax, edx ; ret event id
+    mov eax, int32_t [edx] ; ret the event id
     jmp .end
 
 .failure:
@@ -93,6 +92,10 @@ radiance.event.find:
     xor edi, edi ; loop count
 
 .cmploop:
+    mov eax, [radiance.events + ecx + RadianceEvent.id] ; check to see if the event is occupied (id 0) 
+    cmp eax, 0 
+    je .clnext
+
     mov pointer_t [esp], esi ; compare event names 
     mov eax, [radiance.events + ecx + RadianceEvent.name]
     mov pointer_t [esp + 4], eax
@@ -101,11 +104,12 @@ radiance.event.find:
     cmp eax, 0 ; check if we have a match
     je .found
 
+.clnext:
     add ecx, RadianceEvent.size ; inc pointer
     inc edi 
 
-    cmp edi, radiance.event.cap ; check if we have processed all events
-    je .failure
+    cmp edi, MAX_EVENTS ; check if we have processed all events
+    jge .failure
 
     jmp .cmploop ; loop again
 
@@ -148,7 +152,7 @@ get_available:
     jmp .end
 
 .found:
-    mov eax, [radiance.events + ecx] ; address of the event
+    lea eax, [radiance.events + ecx] ; address of the event
     jmp .end
 
 .end:
