@@ -97,7 +97,7 @@ radiance.event.find:
     je .clnext
 
     mov pointer_t [esp], esi ; compare event names 
-    mov eax, [radiance.events + ecx + RadianceEvent.name]
+    lea eax, [radiance.events + ecx + RadianceEvent.name]
     mov pointer_t [esp + 4], eax
     call radiance.strcmp
 
@@ -118,7 +118,7 @@ radiance.event.find:
     jmp .end
 
 .found:
-    mov eax, [radiance.events + ecx] ; address of the event
+    lea eax, [radiance.events + ecx] ; address of the event
     jmp .end
 
 .end:

@@ -27,7 +27,7 @@ radiance.event.join:
 
     mov esi, pointer_t [ebp + 8] ; event name
     mov edi, pointer_t [ebp + 12] ; subroutine
-
+    
     mov pointer_t [esp], esi ; find the event
     call radiance.event.find
 
@@ -35,7 +35,7 @@ radiance.event.join:
     je .end
 
     mov esi, int32_t [eax + RadianceEvent.id] ; move the event id
-    
+
     call get_available ; get an available participant address
     cmp eax, -1 ; availablity check
     je .end
@@ -43,11 +43,11 @@ radiance.event.join:
     mov pointer_t [eax + EventParticipant.sub], edi ; move the subroutine
     mov int32_t [eax + EventParticipant.eventid], esi ; move the event id
 
-    mov int32_t [edi], idcounter ; get an id for ourselves
-    inc edi
+    mov edi, idcounter ; get an id for ourselves
+    inc int32_t [edi]
 
     mov int32_t [eax + EventParticipant.id], edi
-    mov eax, edi ; ret the id
+    mov eax, int32_t [edi] ; ret the id
 
 .end:
     epilogue 16
@@ -87,7 +87,7 @@ get_available:
     jmp .end
 
 .found:
-    mov eax, [radiance.event.members + ecx] ; address of the participant
+    lea eax, [radiance.event.members + ecx] ; address of the participant
     jmp .end
 
 .end:
