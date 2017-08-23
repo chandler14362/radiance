@@ -25,10 +25,13 @@ section .text
 radiance.event.join:
     prologue 16
 
+    push esi
+    push edi
+
     mov esi, pointer_t [ebp + 8] ; event name
     mov edi, pointer_t [ebp + 12] ; subroutine
     
-    mov pointer_t [esp], esi ; find the event
+    mov pointer_t [esp], esi ; find the event by name
     call radiance.event.find
 
     cmp eax, -1 ; did we find the event? if not, end the routine
@@ -46,10 +49,14 @@ radiance.event.join:
     mov edi, idcounter ; get an id for ourselves
     inc int32_t [edi]
 
-    mov int32_t [eax + EventParticipant.id], edi
-    mov eax, int32_t [edi] ; ret the id
+    mov esi, int32_t [edi] ; claim the participant and return its id
+    mov int32_t [eax + EventParticipant.id], esi
+    mov eax, esi
 
 .end:
+    pop edi
+    push esi
+
     epilogue 16
 
 
@@ -65,6 +72,8 @@ radiance.event.leave:
 ; returns -1 if all addresses are occupied
 get_available:
     prologue 16
+
+    push edi
 
     xor ecx, ecx ; participant ptr
     xor edi, edi ; loop count
@@ -91,4 +100,5 @@ get_available:
     jmp .end
 
 .end:
+    pop edi
     epilogue 16

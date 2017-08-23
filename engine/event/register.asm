@@ -12,6 +12,8 @@ global radiance.event.remove
 global radiance.event.find
 global radiance.event.cap
 
+global radiance.events
+
 section .data
     radiance.event.cap: int32_st MAX_EVENTS
     idcounter: int32_st 0
@@ -27,6 +29,9 @@ section .text
 radiance.event.register:
     prologue 16
 
+    push esi
+    push ebx
+
     mov esi, pointer_t [ebp + 8] ; event name
 
     mov pointer_t [esp], esi ; check to see if an event with the name already exists
@@ -35,14 +40,15 @@ radiance.event.register:
     cmp eax, -1 ; check to see if we are trying to register an event that already exists
     jne .failure
 
-    mov edx, idcounter ; get a new id
-    inc int32_t [edx]
-
     call get_available ; get an available address
     cmp eax, -1
     je .failure
 
-    mov int32_t [eax + RadianceEvent.id], edx ; claim the event as our own
+    mov edx, idcounter ; get a new id
+    inc int32_t [edx]
+    mov ecx, [edx]
+
+    mov int32_t [eax + RadianceEvent.id], ecx ; claim the event as our own
 
     ; copy the name to the event
     xor ecx, ecx
@@ -68,6 +74,9 @@ radiance.event.register:
     jmp .end
 
 .end:
+    pop ebx
+    pop esi
+
     epilogue 16
 
 
@@ -86,26 +95,32 @@ radiance.event.remove:
 radiance.event.find:
     prologue 16
 
+    push esi
+    push edi
+
     mov esi, pointer_t [ebp + 8] ; event name
-    
-    xor ecx, ecx ; event list index
+
+    xor ebx, ebx ; event list index
     xor edi, edi ; loop count
 
 .cmploop:
-    mov eax, [radiance.events + ecx + RadianceEvent.id] ; check to see if the event is occupied (id 0) 
+    mov eax, [radiance.events + ebx + RadianceEvent.id] ; check to see if the event is occupied (id 0) 
     cmp eax, 0 
     je .clnext
 
-    mov pointer_t [esp], esi ; compare event names 
-    lea eax, [radiance.events + ecx + RadianceEvent.name]
+    sub esp, 8 ; compare the two event names
+    mov pointer_t [esp], esi
+    lea eax, [radiance.events + ebx + RadianceEvent.name]
     mov pointer_t [esp + 4], eax
+
     call radiance.strcmp
+    add esp, 8
 
     cmp eax, 0 ; check if we have a match
     je .found
 
 .clnext:
-    add ecx, RadianceEvent.size ; inc pointer
+    add ebx, RadianceEvent.size ; inc pointer
     inc edi 
 
     cmp edi, MAX_EVENTS ; check if we have processed all events
@@ -118,10 +133,12 @@ radiance.event.find:
     jmp .end
 
 .found:
-    lea eax, [radiance.events + ecx] ; address of the event
+    lea eax, [radiance.events + ebx] ; address of the event
     jmp .end
 
 .end:
+    pop edi
+    pop esi
     epilogue 16
 
 
@@ -130,6 +147,8 @@ radiance.event.find:
 ; returns -1 if all addresses are occupied
 get_available:
     prologue 16
+
+    push edi
 
     xor ecx, ecx ; event ptr
     xor edi, edi ; loop count
@@ -156,4 +175,5 @@ get_available:
     jmp .end
 
 .end:
+    pop edi
     epilogue 16

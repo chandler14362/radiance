@@ -4,11 +4,14 @@ global radiance.strcmp
 
 section .text
 
-
 ; RADIANCE.STRCMP
 ; compares two null terminated strings 
 radiance.strcmp:
     prologue 16
+
+    push edi
+    push esi
+    push ebx
 
     mov edi, [ebp + 8] ; str a ptr
     mov esi, [ebp + 12] ; str b ptr
@@ -42,4 +45,8 @@ radiance.strcmp:
     jmp .end
 
 .end: 
+    pop ebx
+    pop esi
+    pop edi
+
     epilogue 16
