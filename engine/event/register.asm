@@ -46,7 +46,7 @@ radiance.event.register:
 
     mov edx, idcounter ; get a new id
     inc int32_t [edx]
-    mov ecx, [edx]
+    mov ecx, int32_t [edx]
 
     mov int32_t [eax + RadianceEvent.id], ecx ; claim the event as our own
 
@@ -97,6 +97,7 @@ radiance.event.find:
 
     push esi
     push edi
+    push ebx
 
     mov esi, pointer_t [ebp + 8] ; event name
 
@@ -137,6 +138,7 @@ radiance.event.find:
     jmp .end
 
 .end:
+    pop ebx
     pop edi
     pop esi
     epilogue 16
